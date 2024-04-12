@@ -38,6 +38,22 @@ To get started with the server, follow these steps:
   - Request body: { username, password }
   - Response: { success, message, user }
 
+## Mongoose ORM Implementation
+
+The Mongoose ORM is used to interact with the MongoDB database in this project. Here's how it's implemented:
+
+1. **Schema Definition**: Mongoose provides a schema-based solution for defining the structure of data stored in MongoDB. In this project, the user schema is defined with fields such as name, email, username, and password, along with their types and validations.
+
+2. **Middleware**: Mongoose middleware functionality is utilized to hash the user's password before saving it to the database. A pre-save hook is used to execute a function before saving a document, ensuring that the password is securely stored.
+
+3. **Instance Methods**: Mongoose allows defining instance methods on schema, which can be used to perform operations specific to a document. In this project, a method to compare passwords is defined to validate user login credentials securely.
+
+4. **Model Creation**: Mongoose provides a model interface for interacting with MongoDB collections. The User model is created using `mongoose.model`, specifying the schema and collection name. This model acts as an intermediary between the application and the MongoDB database, providing methods for CRUD operations.
+
+## License
+
+This project is licensed under the ISC License. See the LICENSE file for details.
+
 ## Contributors
 
 - Ermal Limaj
