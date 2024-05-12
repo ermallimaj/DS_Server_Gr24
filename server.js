@@ -1,6 +1,7 @@
 const express = require("express");
 const userRouter = require("./Routes/userRoutes");
 const cors = require("cors");
+const env = require("dotenv").config({ path: "config.env" });
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
@@ -20,7 +21,7 @@ const port = 3000;
 
 mongoose
   .connect(
-    "mongodb+srv://oltiademi30:japani830@cluster.izbfghs.mongodb.net/social-media?retryWrites=true&w=majority",
+    process.env.MONGO_URL,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -37,3 +38,4 @@ app.use("/api/v1/users", userRouter);
 app.listen(port, () => {
   console.log(`Server is running on  http://localhost:${port}`);
 });
+
