@@ -4,6 +4,7 @@ const cors = require("cors");
 const env = require("dotenv").config({ path: "config.env" });
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const postRouter = require("./Routes/postRoutes");
 
 const app = express();
 
@@ -34,6 +35,7 @@ mongoose
 
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/posts", postRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on  http://localhost:${port}`);
