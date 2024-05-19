@@ -11,7 +11,6 @@ class PostController {
       res.status(500).json({ message: "Internal server error" });
     }
   };
-  
   like = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -53,3 +52,4 @@ class PostController {
   };
 } 
 module.exports = PostController;
+
