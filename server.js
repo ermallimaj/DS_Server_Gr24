@@ -3,11 +3,13 @@ const userRouter = require("./Routes/userRoutes");
 const cors = require("cors");
 const env = require("dotenv").config({ path: "config.env" });
 const bodyParser = require("body-parser");
+const path = require('path');
 const mongoose = require("mongoose");
 const postRouter = require("./Routes/postRoutes");
 
 const app = express();
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
