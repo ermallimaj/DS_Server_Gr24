@@ -11,6 +11,5 @@ router.post('/login', authController.login);
 router.get("/get-user-data",authController.protect,  userController.getUserData);
 router.get("/user/:id", authController.protect, userController.getUserById);
 
-
 module.exports = router;
 

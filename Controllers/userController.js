@@ -1,7 +1,6 @@
 const User = require("../Model/userModel");
 
 class UserController {
-  
   getUserById = async (req, res) => {
     try {
       const user = await User.findById(req.params.id);

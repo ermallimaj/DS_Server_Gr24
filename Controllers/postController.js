@@ -11,7 +11,6 @@ class PostController {
       res.status(500).json({ message: "Internal server error" });
     }
   };
-
   like = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -33,5 +32,24 @@ class PostController {
       });
     }
   };
-}
+
+  dislike = async (req, res) => {
+    const postId = req.params.id;
+    const user = req.user;
+    const post = await Post.findById(postId);
+
+    if (post.likes.includes(user._id)) {
+      await User.updateOne({ _id: user._id }, { $pull: { liked: postId } });
+
+      await Post.updateOne({ _id: postId }, { $pull: { likes: user._id } });
+    } else {
+      res.status(200).json({
+        status: "success",
+        post,
+        user: user,
+      });
+    }
+  };
+} 
 module.exports = PostController;
+
