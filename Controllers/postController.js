@@ -1,3 +1,4 @@
+const Comment = require("../Model/commentModel");
 const Post = require("../Model/postModel");
 const User = require("../Model/userModel");
 
@@ -50,6 +51,78 @@ class PostController {
       });
     }
   };
-} 
-module.exports = PostController;
 
+  comment = async (req, res) => {
+    const postId = req.params.id;
+    const user = req.user;
+    const post = await Post.findById(postId);
+    const comment = req.body.comment;
+
+    const newComment = await Comment.create({
+      comment,
+      onPost: postId,
+      postedBy: user._id,
+    });
+
+    await User.updateOne(
+      { _id: user._id },
+      { $push: { commented: newComment._id } }
+    );
+
+    await Post.updateOne(
+      { _id: postId },
+      { $push: { comments: newComment._id } }
+    );
+
+    res.status(200).json({
+      status: "success",
+      comment: newComment,
+    });
+  };
+
+  deleteComment = async (req, res) => {
+    const commentId = req.params.commentId;
+    const postId = req.params.postId;
+    const user = req.user;
+
+    try {
+      const comment = await Comment.findById(commentId);
+
+      if (comment.postedBy.toString() !== user._id.toString()) {
+        return res
+          .status(403)
+          .json({ message: "You are not authorized to delete this comment" });
+      }
+
+      await Comment.findByIdAndDelete(commentId);
+
+      await User.updateOne(
+        { _id: user._id },
+        { $pull: { commented: commentId } }
+      );
+
+      await Post.updateOne({ _id: postId }, { $pull: { comments: commentId } });
+
+      res.status(200).json({
+        status: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  getPostComments = async (req, res) => {
+    const postId = req.params.id;
+
+    const comments = await Comment.find({ onPost: postId }).populate(
+      "postedBy"
+    );
+
+    res.status(200).json({
+      status: "success",
+      comments,
+    });
+  };
+}
+module.exports = PostController;
