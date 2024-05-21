@@ -12,6 +12,17 @@ router.post(
   authController.protect,
   postController.dislike
 );
+router.post("/comment/:id", authController.protect, postController.comment);
+router.delete(
+  "/:postId/:commentId",
+  authController.protect,
+  postController.deleteComment
+);
+router.get(
+  "/:id/comments",
+  authController.protect,
+  postController.getPostComments
+);
 
 
 
