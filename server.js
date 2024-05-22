@@ -5,7 +5,6 @@ const env = require("dotenv").config({ path: "config.env" });
 const bodyParser = require("body-parser");
 const path = require('path');
 const mongoose = require("mongoose");
-const path = require("path");
 const postRouter = require("./Routes/postRoutes");
 
 const app = express();
