@@ -1,11 +1,11 @@
 const express = require("express");
 const userRouter = require("./Routes/userRoutes");
+const postRouter = require("./Routes/postRoutes");
 const cors = require("cors");
 const env = require("dotenv").config({ path: "config.env" });
 const bodyParser = require("body-parser");
 const path = require('path');
 const mongoose = require("mongoose");
-const postRouter = require("./Routes/postRoutes");
 
 const app = express();
 
