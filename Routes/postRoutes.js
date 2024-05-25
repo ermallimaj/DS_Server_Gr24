@@ -6,6 +6,7 @@ const authController = new AuthController();
 const router = express.Router();
 
 router.get("/", postController.getAllPosts);
+router.get("/:id", postController.getUserPosts);
 router.post("/like-post/:id", authController.protect, postController.like);
 router.post(
   "/dislike-post/:id",

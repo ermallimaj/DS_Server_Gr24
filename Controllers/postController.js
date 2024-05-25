@@ -14,6 +14,17 @@ class PostController {
     }
   };
 
+  getUserPosts = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const posts = await Post.find({ user: userId });
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
   like = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -30,11 +41,11 @@ class PostController {
       // Create a notification
       const notification = new Notification({
         user: post.user,
-        type: 'like',
+        type: "like",
         postId: post._id,
         userProfileImage: user.profileImage,
         postImage: post.image,
-        username: user.username
+        username: user.username,
       });
       await notification.save();
 
@@ -88,12 +99,12 @@ class PostController {
     // Create a notification
     const notification = new Notification({
       user: post.user,
-      type: 'comment',
+      type: "comment",
       postId: post._id,
       userProfileImage: user.profileImage,
       postImage: post.image,
       username: user.username,
-      commentText: comment
+      commentText: comment,
     });
     await notification.save();
 
