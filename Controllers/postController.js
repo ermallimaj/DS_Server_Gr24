@@ -1,6 +1,7 @@
 const Comment = require("../Model/commentModel");
 const Post = require("../Model/postModel");
 const User = require("../Model/userModel");
+const Notification = require("../Model/notificationModel");
 
 class PostController {
   getAllPosts = async (req, res) => {
@@ -12,6 +13,7 @@ class PostController {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
   like = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -23,8 +25,18 @@ class PostController {
       });
     } else {
       await User.updateOne({ _id: user._id }, { $push: { liked: postId } });
-
       await Post.updateOne({ _id: postId }, { $push: { likes: user._id } });
+
+      // Create a notification
+      const notification = new Notification({
+        user: post.user,
+        type: 'like',
+        postId: post._id,
+        userProfileImage: user.profileImage,
+        postImage: post.image,
+        username: user.username
+      });
+      await notification.save();
 
       res.status(200).json({
         status: "success",
@@ -41,7 +53,6 @@ class PostController {
 
     if (post.likes.includes(user._id)) {
       await User.updateOne({ _id: user._id }, { $pull: { liked: postId } });
-
       await Post.updateOne({ _id: postId }, { $pull: { likes: user._id } });
     } else {
       res.status(200).json({
@@ -73,6 +84,18 @@ class PostController {
       { _id: postId },
       { $push: { comments: newComment._id } }
     );
+
+    // Create a notification
+    const notification = new Notification({
+      user: post.user,
+      type: 'comment',
+      postId: post._id,
+      userProfileImage: user.profileImage,
+      postImage: post.image,
+      username: user.username,
+      commentText: comment
+    });
+    await notification.save();
 
     res.status(200).json({
       status: "success",

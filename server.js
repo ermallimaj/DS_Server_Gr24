@@ -1,6 +1,7 @@
 const express = require("express");
 const userRouter = require("./Routes/userRoutes");
 const postRouter = require("./Routes/postRoutes");
+const notificationRouter = require("./Routes/notificationRoutes");
 const cors = require("cors");
 const env = require("dotenv").config({ path: "config.env" });
 const bodyParser = require("body-parser");
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+
 const port = 3000;
 
 mongoose
@@ -31,15 +33,13 @@ mongoose
     }
   )
   .then((con) => {
-    console.log("Db connection succesful");
+    console.log("Db connection successful");
   });
-
-
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 app.listen(port, () => {
-  console.log(`Server is running on  http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
-
