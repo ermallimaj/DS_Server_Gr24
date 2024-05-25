@@ -17,8 +17,6 @@ class AuthController {
       httpOnly: true,
     };
 
-    // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-
     res.cookie("jwt", token, cookieOptions);
 
     user.password = undefined;
@@ -83,10 +81,8 @@ class AuthController {
       });
     }
   };
+
   protect = async (req, res, next) => {
-    // if (req.path === "/logout") {
-    //   return next();
-    // }
     let token;
     if (
       req.headers.authorization &&
@@ -94,32 +90,34 @@ class AuthController {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
+
     if (!token) {
-      return next(
-        new Error(
-          `You are not logged in! Please log in to get access. ${token}`
-        )
-      );
+      return res.status(401).json({
+        success: false,
+        message: "You are not logged in! Please log in to get access.",
+      });
     }
 
-    const decoded = await promisify(jwt.verify)(token, "my_secret");
+    try {
+      const decoded = await promisify(jwt.verify)(token, "my_secret");
 
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
-      console.log(currentUser);
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return res.status(401).json({
+          success: false,
+          message: "The user belonging to this token does no longer exist.",
+        });
+      }
 
-      return next(
-        new Error("You are not logged in! Please log in to get access.")
-      );
+      req.user = currentUser;
+      next();
+    } catch (error) {
+      console.error("Error verifying token:", error);
+      res.status(401).json({
+        success: false,
+        message: "You are not logged in! Please log in to get access.",
+      });
     }
-
-    // if (currentUser.changedPasswordAfter(decoded.iat)) {
-    //   return next("User recently changed password! Please log in again.");
-    // }
-
-    req.user = currentUser;
-    res.locals.user = currentUser;
-    next();
   };
 }
 
