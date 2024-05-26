@@ -124,12 +124,15 @@ class UserController {
         await currentUser.save();
         await userToFollow.save();
 
-        await notificationsController.notifyUser({
+        const notification = {
           user: userToFollow._id,
           type: "follow",
+          sentById: currentUser._id,
           userProfileImage: currentUser.profileImage,
           username: currentUser.username,
-        });
+          postId: null,
+        };
+        await notificationsController.notifyUser(notification);
       }
 
       res.status(200).json({

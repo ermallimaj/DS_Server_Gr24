@@ -46,6 +46,7 @@ class PostController {
         userProfileImage: user.profileImage,
         postImage: post.image,
         username: user.username,
+        sentById: user._id,
       });
       await notification.save();
 
@@ -96,7 +97,6 @@ class PostController {
       { $push: { comments: newComment._id } }
     );
 
-    // Create a notification
     const notification = new Notification({
       user: post.user,
       type: "comment",
@@ -105,6 +105,7 @@ class PostController {
       postImage: post.image,
       username: user.username,
       commentText: comment,
+      sentById: user._id,
     });
     await notification.save();
 
@@ -159,4 +160,5 @@ class PostController {
     });
   };
 }
+
 module.exports = PostController;

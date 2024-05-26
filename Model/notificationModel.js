@@ -33,6 +33,15 @@ const notificationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  seen: {
+    type: Boolean,
+    default: false,
+  },
+  sentById: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 const Notification = mongoose.model("Notification", notificationSchema, "notifications");

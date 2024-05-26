@@ -23,6 +23,22 @@ class NotificationsController {
       console.error("Error sending notification:", error);
     }
   };
+
+  markNotificationAsSeen = async (req, res) => {
+    try {
+      await Notification.updateMany(
+        { user: req.user._id, seen: false },
+        { seen: true }
+      );
+      res.status(200).json({
+        status: "success",
+        message: "Notifications marked as seen",
+      });
+    } catch (error) {
+      console.error("Error marking notifications as seen:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
 }
 
 module.exports = NotificationsController;
