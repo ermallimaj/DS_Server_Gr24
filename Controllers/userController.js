@@ -1,6 +1,9 @@
 const User = require("../Model/userModel");
 const multer = require('multer');
 const sharp = require('sharp');
+const Notification = require("../Model/notificationModel");
+const NotificationsController = require("../Controllers/notificationController");
+const notificationsController = new NotificationsController();
 
 const multerStorage = multer.memoryStorage();
 
@@ -102,6 +105,95 @@ class UserController {
       });
     } catch (error) {
       console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  followUser = async (req, res) => {
+    try {
+      const userToFollow = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.user.id);
+
+      if (!userToFollow || !currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!currentUser.following.includes(userToFollow._id)) {
+        currentUser.following.push(userToFollow._id);
+        userToFollow.followers.push(currentUser._id);
+        await currentUser.save();
+        await userToFollow.save();
+
+        await notificationsController.notifyUser({
+          user: userToFollow._id,
+          type: "follow",
+          userProfileImage: currentUser.profileImage,
+          username: currentUser.username,
+        });
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: `You are now following ${userToFollow.username}`,
+      });
+    } catch (error) {
+      console.error("Error following user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  unfollowUser = async (req, res) => {
+    try {
+      const userToUnfollow = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.user.id);
+
+      if (!userToUnfollow || !currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      currentUser.following.pull(userToUnfollow._id);
+      userToUnfollow.followers.pull(currentUser._id);
+      await currentUser.save();
+      await userToUnfollow.save();
+
+      res.status(200).json({
+        status: "success",
+        message: `You have unfollowed ${userToUnfollow.username}`,
+      });
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  getFollowers = async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id).populate('followers', 'username profileImage');
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json({
+        status: "success",
+        followers: user.followers,
+      });
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  getFollowing = async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id).populate('following', 'username profileImage');
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json({
+        status: "success",
+        following: user.following,
+      });
+    } catch (error) {
+      console.error("Error fetching following:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   };
