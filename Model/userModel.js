@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Room",
   },
+  savedPosts: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "SavedPost",
+  },
 });
 
 userSchema.pre("save", async function (next) {

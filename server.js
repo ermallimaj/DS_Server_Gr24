@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = require("./Routes/userRoutes");
 const postRouter = require("./Routes/postRoutes");
 const notificationRouter = require("./Routes/notificationRoutes");
+const savedPostRoutes = require('./Routes/savedPostRoutes');
 const roomRouter = require("./Routes/roomRoutes");
 const cors = require("cors");
 const env = require("dotenv").config({ path: "config.env" });
@@ -40,8 +41,8 @@ mongoose
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use('/api/v1/savedposts', savedPostRoutes);
 app.use("/api/v1/room", roomRouter);
-
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
