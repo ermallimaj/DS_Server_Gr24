@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
     ref: "Comment",
   },
   roomId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: [mongoose.Schema.Types.ObjectId],
     ref: "Room",
   },
 });
