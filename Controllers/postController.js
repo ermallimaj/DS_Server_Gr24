@@ -159,15 +159,17 @@ class PostController {
       comments,
     });
   };
-  
+
   getPostById = async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('user').populate({
-        path: 'comments',
-        populate: {
-          path: 'postedBy',
-        }
-      });
+      const post = await Post.findById(req.params.id)
+        .populate("user")
+        .populate({
+          path: "comments",
+          populate: {
+            path: "postedBy",
+          },
+        });
       if (!post) {
         return res.status(404).json({ message: "Post not found" });
       }
@@ -179,6 +181,17 @@ class PostController {
       console.error("Error fetching post:", error);
       res.status(500).json({ message: "Internal server error" });
     }
+  };
+
+  deletePost = async (req, res) => {
+    const postId = req.params.id;
+    await Post.findByIdAndDelete(postId);
+
+    await User.updateOne({ _id: req.user._id }, { $pull: { posts: postId } });
+
+    res.status(200).json({
+      status: "deleted",
+    });
   };
 }
 

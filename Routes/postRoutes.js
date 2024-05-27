@@ -15,6 +15,11 @@ router.get("/post/:id",
 authController.protect, 
 postController.getPostById
 );
+router.delete(
+  "/delete-post/:id",
+  authController.protect,
+  postController.deletePost
+);
 router.post("/like-post/:id", authController.protect, postController.like);
 router.post(
   "/dislike-post/:id",
