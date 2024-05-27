@@ -15,6 +15,7 @@ router.get("/post/:id",
 authController.protect, 
 postController.getPostById
 );
+router.post("/upload-post", authController.protect, postController.post);
 router.post("/like-post/:id", authController.protect, postController.like);
 router.post(
   "/dislike-post/:id",
