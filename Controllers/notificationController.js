@@ -2,6 +2,26 @@ const Notification = require("../Model/notificationModel");
 const { io } = require("../server");
 
 class NotificationsController {
+  /**
+   * @swagger
+   * /notifications:
+   *   get:
+   *     summary: Get all notifications for a user
+   *     tags: [Notifications]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: A list of notifications
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Notification'
+   *       500:
+   *         description: Internal server error
+   */
   getNotifications = async (req, res) => {
     try {
       const notifications = await Notification.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -24,6 +44,20 @@ class NotificationsController {
     }
   };
 
+  /**
+   * @swagger
+   * /notifications/mark-notification-as-seen:
+   *   post:
+   *     summary: Mark all notifications as seen
+   *     tags: [Notifications]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: Notifications marked as seen
+   *       500:
+   *         description: Internal server error
+   */
   markNotificationAsSeen = async (req, res) => {
     try {
       await Notification.updateMany(

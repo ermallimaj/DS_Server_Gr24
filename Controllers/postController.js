@@ -4,8 +4,23 @@ const User = require("../Model/userModel");
 const Notification = require("../Model/notificationModel");
 const multer = require("multer");
 
-
 class PostController {
+  /**
+   * @swagger
+   * /posts:
+   *   get:
+   *     summary: Get all posts
+   *     tags: [Posts]
+   *     responses:
+   *       200:
+   *         description: A list of posts
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Post'
+   */
   getAllPosts = async (req, res) => {
     try {
       const posts = await Post.find().sort({ createdAt: -1 });
@@ -16,6 +31,31 @@ class PostController {
     }
   };
 
+  /**
+   * @swagger
+   * /posts/{id}:
+   *   get:
+   *     summary: Get posts by user ID
+   *     tags: [Posts]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The user ID
+   *     responses:
+   *       200:
+   *         description: A list of posts
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Post'
+   *       500:
+   *         description: Internal server error
+   */
   getUserPosts = async (req, res) => {
     try {
       const userId = req.params.id;
@@ -38,6 +78,32 @@ class PostController {
 
   upload = multer({ storage: this.storage }).single("image");
 
+  /**
+   * @swagger
+   * /posts/upload-post:
+   *   post:
+   *     summary: Upload a new post
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               image:
+   *                 type: string
+   *                 format: binary
+   *               caption:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Post uploaded successfully
+   *       500:
+   *         description: Internal server error
+   */
   post = async (req, res) => {
     this.upload(req, res, async (err) => {
       if (err) {
@@ -72,6 +138,29 @@ class PostController {
     });
   };
 
+  /**
+   * @swagger
+   * /posts/like-post/{id}:
+   *   post:
+   *     summary: Like a post
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID
+   *     responses:
+   *       200:
+   *         description: Post liked successfully
+   *       404:
+   *         description: Post already liked
+   *       500:
+   *         description: Internal server error
+   */
   like = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -105,6 +194,27 @@ class PostController {
     }
   };
 
+  /**
+   * @swagger
+   * /posts/dislike-post/{id}:
+   *   post:
+   *     summary: Dislike a post
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID
+   *     responses:
+   *       200:
+   *         description: Post disliked successfully
+   *       500:
+   *         description: Internal server error
+   */
   dislike = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -122,6 +232,37 @@ class PostController {
     }
   };
 
+  /**
+   * @swagger
+   * /posts/comment/{id}:
+   *   post:
+   *     summary: Comment on a post
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               comment:
+   *                 type: string
+   *                 example: This is a comment
+   *     responses:
+   *       200:
+   *         description: Comment added successfully
+   *       500:
+   *         description: Internal server error
+   */
   comment = async (req, res) => {
     const postId = req.params.id;
     const user = req.user;
@@ -162,6 +303,35 @@ class PostController {
     });
   };
 
+  /**
+   * @swagger
+   * /posts/{postId}/{commentId}:
+   *   delete:
+   *     summary: Delete a comment
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: postId
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID
+   *       - in: path
+   *         name: commentId
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The comment ID
+   *     responses:
+   *       200:
+   *         description: Comment deleted successfully
+   *       403:
+   *         description: Unauthorized to delete this comment
+   *       500:
+   *         description: Internal server error
+   */
   deleteComment = async (req, res) => {
     const commentId = req.params.commentId;
     const postId = req.params.postId;
@@ -194,6 +364,27 @@ class PostController {
     }
   };
 
+  /**
+   * @swagger
+   * /posts/{id}/comments:
+   *   get:
+   *     summary: Get comments for a post
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID
+   *     responses:
+   *       200:
+   *         description: Comments fetched successfully
+   *       500:
+   *         description: Internal server error
+   */
   getPostComments = async (req, res) => {
     const postId = req.params.id;
 
@@ -207,6 +398,29 @@ class PostController {
     });
   };
 
+  /**
+   * @swagger
+   * /posts/post/{id}:
+   *   get:
+   *     summary: Get a post by ID
+   *     tags: [Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID
+   *     responses:
+   *       200:
+   *         description: Post fetched successfully
+   *       404:
+   *         description: Post not found
+   *       500:
+   *         description: Internal server error
+   */
   getPostById = async (req, res) => {
     try {
       const post = await Post.findById(req.params.id)

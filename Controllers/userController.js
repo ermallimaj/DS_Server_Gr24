@@ -36,9 +36,30 @@ const resizeUserPhoto = async (req, res, next) => {
   next();
 };
 
-
-
 class UserController {
+  /**
+   * @swagger
+   * /users/user/{id}:
+   *   get:
+   *     summary: Get user by ID
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The user ID
+   *     responses:
+   *       200:
+   *         description: User fetched successfully
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
+   */
   getUserById = async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
@@ -55,6 +76,22 @@ class UserController {
     }
   };
 
+  /**
+   * @swagger
+   * /users/get-user-data:
+   *   get:
+   *     summary: Get logged in user data
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: User data fetched successfully
+   *       401:
+   *         description: Unauthorized
+   *       500:
+   *         description: Internal server error
+   */
   getUserData = (req, res, next) => {
     res.status(200).json({
       message: "success",
@@ -62,6 +99,44 @@ class UserController {
     });
   };
 
+  /**
+   * @swagger
+   * /users/edit-profile:
+   *   put:
+   *     summary: Edit user profile
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               firstName:
+   *                 type: string
+   *                 example: John
+   *               lastName:
+   *                 type: string
+   *                 example: Doe
+   *               username:
+   *                 type: string
+   *                 example: johndoe
+   *               email:
+   *                 type: string
+   *                 example: john@example.com
+   *               photo:
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: Profile updated successfully
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
+   */
   updateUserData = async (req, res) => {
     try {
       const { firstName, lastName, username, email } = req.body;
@@ -96,6 +171,21 @@ class UserController {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+  /**
+   * @swagger
+   * /users/user/all:
+   *   get:
+   *     summary: Get all users
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: Users fetched successfully
+   *       500:
+   *         description: Internal server error
+   */
   getAllUsers = async (req, res) => {
     try {
       const users = await User.find().select('username profileImage'); // Fetch only necessary fields
@@ -109,6 +199,29 @@ class UserController {
     }
   };
 
+  /**
+   * @swagger
+   * /users/follow/{id}:
+   *   post:
+   *     summary: Follow a user
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The user ID to follow
+   *     responses:
+   *       200:
+   *         description: Successfully followed the user
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
+   */
   followUser = async (req, res) => {
     try {
       const userToFollow = await User.findById(req.params.id);
@@ -145,6 +258,29 @@ class UserController {
     }
   };
 
+  /**
+   * @swagger
+   * /users/unfollow/{id}:
+   *   delete:
+   *     summary: Unfollow a user
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The user ID to unfollow
+   *     responses:
+   *       200:
+   *         description: Successfully unfollowed the user
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
+   */
   unfollowUser = async (req, res) => {
     try {
       const userToUnfollow = await User.findById(req.params.id);
@@ -169,6 +305,29 @@ class UserController {
     }
   };
 
+  /**
+   * @swagger
+   * /users/followers/{id}:
+   *   get:
+   *     summary: Get user's followers
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The user ID
+   *     responses:
+   *       200:
+   *         description: Followers fetched successfully
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
+   */
   getFollowers = async (req, res) => {
     try {
       const user = await User.findById(req.params.id).populate('followers', 'username profileImage');
@@ -185,6 +344,29 @@ class UserController {
     }
   };
 
+  /**
+   * @swagger
+   * /users/following/{id}:
+   *   get:
+   *     summary: Get user's following
+   *     tags: [Users]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The user ID
+   *     responses:
+   *       200:
+   *         description: Following fetched successfully
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
+   */
   getFollowing = async (req, res) => {
     try {
       const user = await User.findById(req.params.id).populate('following', 'username profileImage');
