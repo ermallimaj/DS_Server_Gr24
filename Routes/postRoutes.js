@@ -5,6 +5,21 @@ const postController = new PostController();
 const authController = new AuthController();
 const router = express.Router();
 
+router.get("/", 
+postController.getAllPosts
+);
+router.get("/:id", 
+postController.getUserPosts
+);
+router.get("/post/:id", 
+authController.protect, 
+postController.getPostById
+);
+router.delete(
+  "/delete-post/:id",
+  authController.protect,
+  postController.deletePost
+);
 /**
  * @swagger
  * /posts:

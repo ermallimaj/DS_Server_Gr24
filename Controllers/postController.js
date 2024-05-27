@@ -443,6 +443,17 @@ class PostController {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+  deletePost = async (req, res) => {
+    const postId = req.params.id;
+    await Post.findByIdAndDelete(postId);
+
+    await User.updateOne({ _id: req.user._id }, { $pull: { posts: postId } });
+
+    res.status(200).json({
+      status: "deleted",
+    });
+  };
 }
 
 module.exports = PostController;
