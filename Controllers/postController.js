@@ -2,6 +2,8 @@ const Comment = require("../Model/commentModel");
 const Post = require("../Model/postModel");
 const User = require("../Model/userModel");
 const Notification = require("../Model/notificationModel");
+const multer = require("multer");
+
 
 class PostController {
   getAllPosts = async (req, res) => {
@@ -23,6 +25,51 @@ class PostController {
       console.error("Error fetching posts:", error);
       res.status(500).json({ message: "Internal server error" });
     }
+  };
+
+  storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "uploads/");
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+
+  upload = multer({ storage: this.storage }).single("image");
+
+  post = async (req, res) => {
+    this.upload(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+
+      const userId = req.user._id;
+
+      const newPost = new Post({
+        image: req.file.filename,
+        caption: req.body.caption,
+        user: userId,
+      });
+
+      try {
+        const savedPost = await newPost.save();
+
+        await User.updateOne(
+          { _id: userId },
+          { $push: { posts: savedPost._id } }
+        );
+
+        res.status(200).json({
+          status: "success",
+          savedPost,
+        });
+      } catch (error) {
+        // Handle errors
+        console.error("Error saving post:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    });
   };
 
   like = async (req, res) => {
@@ -159,15 +206,17 @@ class PostController {
       comments,
     });
   };
-  
+
   getPostById = async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('user').populate({
-        path: 'comments',
-        populate: {
-          path: 'postedBy',
-        }
-      });
+      const post = await Post.findById(req.params.id)
+        .populate("user")
+        .populate({
+          path: "comments",
+          populate: {
+            path: "postedBy",
+          },
+        });
       if (!post) {
         return res.status(404).json({ message: "Post not found" });
       }
