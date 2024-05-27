@@ -30,6 +30,37 @@ class AuthController {
     });
   }
 
+  /**
+   * @swagger
+   * /auth/signup:
+   *   post:
+   *     summary: Sign up a new user
+   *     tags: [Authentication]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               name:
+   *                 type: string
+   *                 example: John Doe
+   *               email:
+   *                 type: string
+   *                 example: john@example.com
+   *               username:
+   *                 type: string
+   *                 example: johndoe
+   *               password:
+   *                 type: string
+   *                 example: password123
+   *     responses:
+   *       201:
+   *         description: User created successfully
+   *       500:
+   *         description: Could not create user. Please try again later.
+   */
   async signup(req, res, next) {
     try {
       const newUser = new User({
@@ -53,6 +84,33 @@ class AuthController {
     }
   }
 
+  /**
+   * @swagger
+   * /auth/login:
+   *   post:
+   *     summary: Log in a user
+   *     tags: [Authentication]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               username:
+   *                 type: string
+   *                 example: johndoe
+   *               password:
+   *                 type: string
+   *                 example: password123
+   *     responses:
+   *       200:
+   *         description: User logged in successfully
+   *       401:
+   *         description: Invalid username or password
+   *       500:
+   *         description: Could not log in. Please try again later.
+   */
   login = async (req, res, next) => {
     try {
       const { username, password } = req.body;
@@ -82,6 +140,20 @@ class AuthController {
     }
   };
 
+  /**
+   * @swagger
+   * /auth/protect:
+   *   get:
+   *     summary: Protect a route
+   *     tags: [Authentication]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: Route protected successfully
+   *       401:
+   *         description: You are not logged in! Please log in to get access.
+   */
   protect = async (req, res, next) => {
     let token;
     if (

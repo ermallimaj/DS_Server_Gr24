@@ -2,6 +2,26 @@ const SavedPost = require("../Model/savedPostModel");
 const User = require("../Model/userModel");
 
 class SavedPostController {
+  /**
+   * @swagger
+   * /savedposts:
+   *   get:
+   *     summary: Get all saved posts for a user
+   *     tags: [Saved Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: A list of saved posts
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/SavedPost'
+   *       500:
+   *         description: Internal server error
+   */
   getAllSavedPosts = async (req, res) => {
     try {
       const savedPosts = await SavedPost.find({ user: req.user._id }).populate("post");
@@ -12,6 +32,27 @@ class SavedPostController {
     }
   };
 
+  /**
+   * @swagger
+   * /savedposts/save/{postId}:
+   *   post:
+   *     summary: Save a post
+   *     tags: [Saved Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: postId
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID to save
+   *     responses:
+   *       200:
+   *         description: Post saved successfully
+   *       500:
+   *         description: Internal server error
+   */
   savePost = async (req, res) => {
     try {
       const { postId } = req.params;
@@ -28,6 +69,27 @@ class SavedPostController {
     }
   };
 
+  /**
+   * @swagger
+   * /savedposts/unsave/{postId}:
+   *   delete:
+   *     summary: Unsave a post
+   *     tags: [Saved Posts]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: postId
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The post ID to unsave
+   *     responses:
+   *       200:
+   *         description: Post unsaved successfully
+   *       500:
+   *         description: Internal server error
+   */
   unsavePost = async (req, res) => {
     try {
       const { postId } = req.params;
